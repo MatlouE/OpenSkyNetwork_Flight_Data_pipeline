@@ -3,11 +3,11 @@ services:
   flights_db:
     image: postgres:15
     environment:
-      POSTGRES_USER: ${DB_USER:-admin}        # Defaults to 'admin' if not in .env
-      POSTGRES_PASSWORD: ${DB_PASS:-pass123}
-      POSTGRES_DB: flight_tracker
+      POSTGRES_USER: "root"       # Defaults to 'admin' if not in .env
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "flights_data"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d flight_tracker"]
+      test: ["CMD-SHELL", "pg_isready -U root -d flights_data"]
       interval: 5s
       timeout: 5s
       retries: 5
