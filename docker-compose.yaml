@@ -3,11 +3,11 @@ services:
   flights_db:
     image: postgres:15
     environment:
-      POSTGRES_USER: "root"       # Defaults to 'admin' if not in .env
-      POSTGRES_PASSWORD: "root"
-      POSTGRES_DB: "flights_data"
+      POSTGRES_USER: ${DB_USER}      # Defaults to 'admin' if not in .env
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root -d flights_data"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,6 +23,9 @@ services:
         condition: service_healthy # Only starts once DB passes healthcheck
     environment:
       DB_HOST: flights_db
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
 
 volumes:
   pg_flight_data:
