@@ -1,34 +1,31 @@
-version: '3.8'
-
 services:
-  postgres_db:
+  # The "Storage" Layer
+  flights_db:
     image: postgres:15
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: weather_db
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${DB_USER}      # Defaults to 'admin' if not in .env
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+      - pg_flight_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: user@domain.com
-      PGADMIN_DEFAULT_PASSWORD: adminpassword
-    ports:
-      - "5050:80"
-    depends_on:
-      - postgres_db
-
-  python_ingestor:
+  # The "Ingestion" Layer
+  sky_ingestor:
     build: ./ingestor
     depends_on:
-      - postgres_db
+      flights_db:
+        condition: service_healthy # Only starts once DB passes healthcheck
     environment:
-      DB_HOST: postgres_db
+      DB_HOST: flights_db
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
 
 volumes:
-  pg_data:
+  pg_flight_data:
