@@ -17,7 +17,7 @@ def test_connection():
             conn = psycopg2.connect(
                 dbname=dbname, user=user, password=password, host=host
             )
-            print("✅ CONNECTION SUCCESSFUL!")
+            print("CONNECTION SUCCESSFUL!")
             conn.close()
             return
         except Exception as e:
